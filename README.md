@@ -73,9 +73,6 @@ memory-mapped interrupt controller and create observable timing differences.
 The PMP experiments show that preventing secret writes to the peripheral range
 can remove this channel.
 
-Detailed results and timings are documented in
-[`docs/supplementary_experiments_2026-04-01.md`](docs/supplementary_experiments_2026-04-01.md).
-
 ## Repository Layout
 
 - `src/sodor2/`: Sodor RTL, platform models, and PTCI verification tops.
@@ -83,7 +80,6 @@ Detailed results and timings are documented in
   verification tops.
 - `verification/`: primary JasperGold verification entry scripts.
 - `results/`: additional experiment-specific JasperGold TCL scripts.
-- `docs/`: experiment results and repository maintenance notes.
 
 ## Requirements
 
@@ -126,6 +122,4 @@ Logic*. This repository repurposes and extends that infrastructure for platform
 timing contract experiments. Shadow Logic is an implementation provenance, not
 the subject of this repository.
 
-See [`docs/REPOSITORY_CLEANUP.md`](docs/REPOSITORY_CLEANUP.md) for repository
-scope and maintenance rules. See [`NOTICE.md`](NOTICE.md) for code provenance
-and [`LICENSE`](LICENSE) for licensing terms.
+See [`LICENSE`](LICENSE) for licensing terms.

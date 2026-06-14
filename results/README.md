@@ -8,4 +8,5 @@ This directory contains experiment-specific JasperGold TCL scripts.
 JasperGold project directories (`my_proj_*`), database files (`my_jdb_*`), and
 raw terminal logs are generated locally and intentionally excluded from version
 control. Raw logs commonly contain personal paths, hostnames, and commercial
-tool session details. Record conclusions in `docs/` instead.
+tool session details. Record relevant conclusions in the main README or paper
+instead.
