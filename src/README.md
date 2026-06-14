@@ -10,8 +10,12 @@ The source tree is organized by hardware and verification responsibility:
   the JasperGold experiment scripts. Miter files and their top-level modules use
   the `miter_<subject>_<contract-or-variant>` naming convention.
 
-The `-S` processor configurations reuse the corresponding base processor RTL:
+The current demonstration contains core-side, uncore-side, and direct
+full-system miters for C4. C3 miter support is a TODO.
 
-- Sodor-S uses the Sodor core with an interrupt-masking verification top.
-- SimpleOoO-S uses the SimpleOoO core with the Delay defense enabled by compile
-  definitions and a PMP constraint in the experiment script.
+Both C4 core configurations reuse the same Sodor RTL. The Sodor-S experiment is
+represented by the PMP constraint in its JasperGold script rather than by a
+separate processor implementation.
+
+The SimpleOoO RTL is retained as source provenance but is not part of the
+current runnable C4 demonstration.

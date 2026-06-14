@@ -1,44 +1,39 @@
 # Experiments
 
-This directory contains the JasperGold scripts included in this demonstration.
-Run each script independently from the repository root. A counterexample is an
-expected experimental result where indicated.
+This directory contains the JasperGold scripts for the C4 demonstration. Run
+each script independently from the repository root.
 
-## Core
+## Core Verification
 
-The core experiments verify four processor configurations under the C3
-platform timing contract. C3 models a platform where written data may affect
-response timing and a memory-mapped interrupt.
+These experiments verify Sodor against the C4 platform timing contract without
+instantiating a concrete platform.
 
-| Script | Processor configuration | Expected result |
+| Script | Configuration | Expected result |
 | --- | --- | --- |
-| `core/sodor.tcl` | Baseline Sodor | Fail |
-| `core/sodor_s.tcl` | Sodor-S with interrupt masking | Pass |
-| `core/simpleooo.tcl` | SimpleOoO with NoFwd | Fail |
-| `core/simpleooo_s.tcl` | SimpleOoO-S with Delay and PMP | Pass |
+| `core/sodor_c4.tcl` | Sodor without PMP constraint | Counterexample |
+| `core/sodor_s_c4.tcl` | Sodor with PMP constraint | Proven |
 
-Run a core experiment with:
+## Uncore Verification
 
-```sh
-jg -batch -proj my_project experiments/core/sodor.tcl
-```
+This experiment verifies that the address-decoded interrupt-controller platform
+complies with C4.
 
-## Uncore
+| Script | Expected result |
+| --- | --- |
+| `uncore/interrupt_controller_c4.tcl` | Proven |
 
-The uncore experiments verify whether individual platform components comply
-with the platform timing contracts expected by a core.
+## Full-System Baseline
 
-| Script | Component | Checks |
+These control experiments directly verify the composed Sodor and interrupt
+controller instead of using the contract-based decomposition.
+
+| Script | Configuration | Historical result |
 | --- | --- | --- |
-| `uncore/regular_cache.tcl` | Regular cache | C2 passes; C1 fails. |
-| `uncore/secure_cache.tcl` | Fixed-latency secure cache | C1 passes. |
-| `uncore/interrupt_controller.tcl` | Memory-mapped interrupt controller | C2 fails; C3 permits the flow. |
+| `system/sodor_interrupt_controller_c4.tcl` | Without PMP constraint | Timeout after 7 days |
+| `system/sodor_s_interrupt_controller_c4.tcl` | With PMP constraint | Proven |
 
-Run an uncore experiment with:
+The full-system timeout is an expected control result demonstrating that direct
+composition can be substantially harder to analyze. It does not imply that
+every full-system verification attempt must time out.
 
-```sh
-jg -batch -proj my_project experiments/uncore/regular_cache.tcl
-```
-
-JasperGold project directories, databases, and raw terminal logs are generated
-locally and intentionally excluded from version control.
+C3 experiment support is planned but is not included in this demonstration.

@@ -3,7 +3,8 @@
 // =============================================================================
 // Write non-zero value → assert interrupt
 // Write zero → deassert interrupt
-// This creates wdata → int information flow (satisfies C3 but NOT C2)
+// This creates a wdata → int information flow. The surrounding address decoder
+// determines whether that flow is permitted by a conditional contract such as C4.
 // =============================================================================
 
 module interrupt_controller(

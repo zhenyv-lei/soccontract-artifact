@@ -1,6 +1,6 @@
 # Platform Timing Contracts
 
-Demonstration of core and uncore verification for:
+Demonstration artifact for:
 
 > **Platform Timing Contracts: A Language and Instrumentation for Capturing SoC Timing Channels**
 
@@ -8,125 +8,105 @@ The paper is included as [`soccontracts.pdf`](soccontracts.pdf).
 
 ## Overview
 
-Constant-time CPU verification is commonly performed on an isolated processor.
-Its guarantees may become insufficient after the CPU is integrated with caches,
-memory controllers, interrupt controllers, or other SoC components that create
-additional timing channels.
+Platform timing contracts summarize the timing-relevant information flows
+between a processor core and its surrounding platform. They enable a
+compositional verification strategy:
 
-Platform timing contracts describe the information flows that a platform is
-allowed to feed back into a CPU. A synthesizable **Platform Timing Contract
-Instrumentation (PTCI)** materializes these platform-induced flows so that
-existing CPU verification methods can detect timing channels that would
-otherwise remain outside their verification scope.
+```text
+CPU_TCI(C4) and Platform_TCI(C4) imply Secure(Core + Platform)
+```
 
-The paper makes three main contributions:
+The processor core and platform can therefore be verified independently against
+the same contract. A direct full-system verification is retained as a control
+experiment for comparing verification effort.
 
-1. A language for expressing expected platform-induced timing channels.
-2. A lightweight synthesizable PTCI compatible with existing CPU verification
-   methods.
-3. An evaluation showing that PTCI exposes platform-specific timing channels
-   that isolated CPU verification can miss.
+## Demo Scope
 
-## Repository Scope
+This cleaned demonstration focuses on the conditional C4 contract and a Sodor
+processor connected to a memory-mapped interrupt controller.
 
-This cleaned repository contains the experiments that were actually conducted
-in this codebase:
+C4 permits write data to influence timing and interrupt behavior only when the
+write address is within the designated peripheral range. The PMP-constrained
+configuration prevents secret-dependent writes to that range.
 
-- **Sodor**, a 2-stage in-order RISC-V processor.
-- **SimpleOoO**, a small out-of-order processor with NoFwd and Delay defenses.
-- Platform models covering ideal memory, caches, and memory-mapped interrupt
-  behavior.
-- Core verification under C3 and uncore compliance checks for C1-C3.
+The repository contains three verification layers:
 
-The paper evaluates Sodor and Kronos. This repository instead retains Sodor and
-the additional SimpleOoO experiments performed during the follow-up study. It
-is therefore not a byte-for-byte copy of the paper's original artifact.
+1. **Core verification:** verifies Sodor against C4 using PTCI without a
+   concrete platform implementation.
+2. **Uncore verification:** verifies that the address-decoded interrupt
+   controller complies with C4.
+3. **Full-system verification:** directly composes Sodor and the interrupt
+   controller as a control experiment.
 
-## Example Contracts
-
-The contracts model increasingly permissive platform-induced flows:
-
-| Contract | Platform behavior represented in this repository |
-| --- | --- |
-| C1 | Ideal memory with address-independent timing. |
-| C2 | Cache-like behavior where memory addresses may affect response timing. |
-| C3 | Data-dependent timing and interrupts, such as a memory-mapped interrupt controller. |
-| C4 | C3 refined to a designated peripheral address range; PMP can prevent secret writes to that range. |
-
-A processor verified under a contract is only secure when integrated with a
-platform compatible with that contract.
+Support for the unconditional C3 contract is a **TODO** and is intentionally not
+included in the current runnable experiments.
 
 ## Demonstrated Results
 
-The retained core experiments compare four processor configurations under C3:
+Historical JasperGold runs from the development repository produced:
 
-| Processor configuration | C3 result |
-| --- | --- |
-| SimpleOoO with NoFwd | Counterexample |
-| SimpleOoO-S with Delay and PMP | Proven |
-| Sodor | Counterexample |
-| Sodor-S with interrupt masking | Proven |
+| Verification object | Configuration | Result | Time |
+| --- | --- | --- | --- |
+| Core under C4 | Sodor without PMP | Counterexample | 0.44 s |
+| Core under C4 | Sodor with PMP | Proven | 8.13 s |
+| Full system | Sodor + interrupt controller, without PMP | Timeout | 604800.31 s |
+| Full system | Sodor + interrupt controller, with PMP | Proven | 1.70 s |
 
-The C3 experiments show that secret-dependent stores can affect a
-memory-mapped interrupt controller and create observable timing differences.
-The secure variants show that interrupt masking or preventing secret writes to
-the peripheral range can remove this channel.
+The seven-day full-system timeout demonstrates that direct composition can
+create a difficult verification problem. It does not imply that every
+full-system verification attempt times out.
 
 ## Repository Layout
 
-- `src/core/`: processor RTL for Sodor and SimpleOoO.
-- `src/uncore/`: cache and interrupt-controller RTL.
-- `src/verification/`: core and uncore formal-verification miters, including
-  PTCI and comparison logic.
-- `experiments/core/`: C3 verification for the four processor configurations.
-- `experiments/uncore/`: platform compliance checks for the uncore components.
+- `src/core/`: processor RTL.
+- `src/uncore/`: platform-component RTL.
+- `src/verification/core/`: core-side C4 PTCI miter.
+- `src/verification/uncore/`: platform-side C4 compliance miter.
+- `src/verification/system/`: direct core-plus-uncore control miter.
+- `experiments/core/`: core-side C4 JasperGold scripts.
+- `experiments/uncore/`: platform-side C4 JasperGold script.
+- `experiments/system/`: direct full-system control scripts.
+- `results/`: concise summaries of historical results.
 
 ## Requirements
 
 Formal verification requires **Cadence JasperGold FPV**. JasperGold is
 commercial software and is not distributed with this repository.
 
-Run all commands from the repository root.
+Run all commands from the repository root. A counterexample or timeout may be
+an expected experimental result.
 
 ## Running the Demo
 
-Each command below runs one independent JasperGold project from the repository
-root. A **counterexample is an expected result**, not a failure to run the
-experiment. The limits configured in the scripts are upper bounds; actual
-runtime depends on the JasperGold version and available compute resources.
-
-Run the four C3 core-verification cases:
+Run the decomposed C4 verification:
 
 ```sh
-jg -batch -proj my_proj_sodor experiments/core/sodor.tcl
-jg -batch -proj my_proj_sodor_s experiments/core/sodor_s.tcl
-jg -batch -proj my_proj_simpleooo experiments/core/simpleooo.tcl
-jg -batch -proj my_proj_simpleooo_s experiments/core/simpleooo_s.tcl
+jg -batch -proj my_proj_sodor_c4 experiments/core/sodor_c4.tcl
+jg -batch -proj my_proj_sodor_s_c4 experiments/core/sodor_s_c4.tcl
+jg -batch -proj my_proj_interrupt_controller_c4 experiments/uncore/interrupt_controller_c4.tcl
 ```
 
-Run the three uncore-compliance cases:
+Run the direct full-system controls:
 
 ```sh
-jg -batch -proj my_proj_regular_cache experiments/uncore/regular_cache.tcl
-jg -batch -proj my_proj_secure_cache experiments/uncore/secure_cache.tcl
-jg -batch -proj my_proj_interrupt_controller experiments/uncore/interrupt_controller.tcl
+jg -batch -proj my_proj_system_c4 experiments/system/sodor_interrupt_controller_c4.tcl
+jg -batch -proj my_proj_system_s_c4 experiments/system/sodor_s_interrupt_controller_c4.tcl
 ```
 
-See [`experiments/README.md`](experiments/README.md) for the purpose and
-expected result of each script.
+The configured time limits are upper bounds. In particular, reproducing the
+historical full-system timeout requires allowing the baseline control to run
+for seven days.
 
-Generated JasperGold project directories, databases, and raw terminal logs are
-intentionally excluded from version control.
-
-This demo does not reproduce every experiment or evaluation result reported in
-the paper.
+See [`experiments/README.md`](experiments/README.md) for the expected result of
+each script and [`results/README.md`](results/README.md) for the historical
+comparison.
 
 ## Code Provenance
 
 The verification harness and processor models were initially derived from the
 artifact for *RTL Verification for Secure Speculation Using Contract Shadow
 Logic*. This repository repurposes and extends that infrastructure for platform
-timing contract experiments. Shadow Logic is an implementation provenance, not
+timing contract experiments. Shadow Logic is implementation provenance, not
 the subject of this repository.
 
 See [`LICENSE`](LICENSE) for licensing terms.
