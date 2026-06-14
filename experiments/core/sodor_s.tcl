@@ -5,7 +5,7 @@
 # Expected result: PASS
 # =============================================================================
 
-analyze -sva src/sodor2/sodor_2_stage.sv src/sodor2/two_copy_top_c3_secure.sv src/sodor2/param.vh
+analyze -sva src/core/sodor/sodor_2_stage.sv src/verification/core/sodor_s_c3.sv src/core/sodor/param.vh
 
 elaborate -top top -bbox_mul 256 -bbox_a 1024 -bbox_m plusarg_reader -bbox_m GenericDigitalInIOCell -bbox_m GenericDigitalOutIOCell -bbox_m ClockDividerN -bbox_m EICG_wrapper
 clock clk

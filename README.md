@@ -75,9 +75,10 @@ the peripheral range can remove this channel.
 
 ## Repository Layout
 
-- `src/sodor2/`: Sodor RTL, platform models, and PTCI verification tops.
-- `src/simpleooo/`: SimpleOoO RTL, cache models, interrupt model, and PTCI
-  verification tops.
+- `src/core/`: processor RTL for Sodor and SimpleOoO.
+- `src/uncore/`: cache and interrupt-controller RTL.
+- `src/verification/`: two-copy core verification tops, PTCI, and uncore
+  compliance miters.
 - `experiments/core/`: C3 verification for the four processor configurations.
 - `experiments/uncore/`: platform compliance checks for the uncore components.
 

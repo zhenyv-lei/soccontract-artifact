@@ -5,7 +5,7 @@
 # Expected result: PASS
 # =============================================================================
 
-analyze +define+RF_SIZE=4+RF_SIZE_LOG=2+MEMI_SIZE=16+MEMI_SIZE_LOG=4+MEMD_SIZE=4+MEMD_SIZE_LOG=2+ROB_SIZE=4+ROB_SIZE_LOG=2 -sva ./src/simpleooo/cache_miter_verify.v
+analyze +define+RF_SIZE=4+RF_SIZE_LOG=2+MEMI_SIZE=16+MEMI_SIZE_LOG=4+MEMD_SIZE=4+MEMD_SIZE_LOG=2+ROB_SIZE=4+ROB_SIZE_LOG=2 -sva ./src/verification/uncore/secure_cache_compliance.v
 
 elaborate -top cache_miter_top
 clock clk
