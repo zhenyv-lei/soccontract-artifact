@@ -1,5 +1,5 @@
 # =============================================================================
-# Experiment B: Cache-S Contract Compliance Verification
+# Secure Cache: Uncore Contract Compliance Verification
 # =============================================================================
 # Verify Cache-S satisfies C1 contract (timing independent of address).
 # Expected result: PASS
@@ -25,5 +25,5 @@ set_engine_mode {AM}
 set_prove_time_limit 1h
 
 prove -all
-save -jdb results/my_jdb_cache_s_compliance -capture_setup -capture_session_data -force
+save -jdb my_jdb_secure_cache -capture_setup -capture_session_data -force
 exit

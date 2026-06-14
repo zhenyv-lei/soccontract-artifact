@@ -1,8 +1,9 @@
 # =============================================================================
-# Platform_C2 / Platform_C3: Interrupt Controller Compliance Verification
+# Interrupt Controller: Uncore Contract Compliance Verification
 # =============================================================================
 # Platform_C2: wdata must NOT affect int → expected FAIL
 # Platform_C3: wdata CAN affect int → expected PASS (trivially)
+# Expected result: C2 counterexample; C3-permitted flow is reachable
 # =============================================================================
 
 analyze -sva src/sodor2/intctrl_miter_verify.v src/sodor2/interrupt_controller.v src/sodor2/param.vh
@@ -23,5 +24,5 @@ set_engine_mode {AM}
 set_prove_time_limit 1h
 
 prove -all
-save -jdb results/my_jdb_intctrl_compliance -capture_setup -capture_session_data -force
+save -jdb my_jdb_interrupt_controller -capture_setup -capture_session_data -force
 exit

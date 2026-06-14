@@ -36,7 +36,7 @@ in this codebase:
 - **SimpleOoO**, a small out-of-order processor with NoFwd and Delay defenses.
 - Platform models covering ideal memory, caches, and memory-mapped interrupt
   behavior.
-- C1-C4 platform timing contract verification and PMP-based refinements.
+- Core verification under C3 and uncore compliance checks for C1-C3.
 
 The paper evaluates Sodor and Kronos. This repository instead retains Sodor and
 the additional SimpleOoO experiments performed during the follow-up study. It
@@ -63,23 +63,23 @@ required as the platform permits more feedback channels:
 
 | Processor configuration | C1 | C2 | C3 |
 | --- | --- | --- | --- |
-| SimpleOoO NoFwd | Pass | Fail | Fail |
-| SimpleOoO Delay | Pass | Pass | Fail |
+| SimpleOoO with NoFwd | Pass | Fail | Fail |
+| SimpleOoO-S with Delay and PMP | Pass | Pass | Pass |
 | Sodor | Pass | Pass | Fail |
-| Sodor with PMP constraint | Pass | Pass | Pass |
+| Sodor-S with interrupt masking | Pass | Pass | Pass |
 
 The C3 experiments show that secret-dependent stores can affect a
 memory-mapped interrupt controller and create observable timing differences.
-The PMP experiments show that preventing secret writes to the peripheral range
-can remove this channel.
+The secure variants show that interrupt masking or preventing secret writes to
+the peripheral range can remove this channel.
 
 ## Repository Layout
 
 - `src/sodor2/`: Sodor RTL, platform models, and PTCI verification tops.
 - `src/simpleooo/`: SimpleOoO RTL, cache models, interrupt model, and PTCI
   verification tops.
-- `verification/`: primary JasperGold verification entry scripts.
-- `results/`: curated follow-up experiments grouped by processor or platform.
+- `experiments/core/`: C3 verification for the four processor configurations.
+- `experiments/uncore/`: platform compliance checks for the uncore components.
 
 ## Requirements
 
@@ -88,28 +88,27 @@ commercial software and is not distributed with this repository.
 
 Run all commands from the repository root.
 
-## Reproducing Representative Experiments
+## Reproducing Experiments
 
-Sodor under C1 and C2:
-
-```sh
-jg -batch -proj my_proj_sodor_c1 verification/verify_2_copy_c1_sodor2.tcl
-jg -batch -proj my_proj_sodor_c2 verification/verify_2_copy_c2_sodor2.tcl
-```
-
-SimpleOoO under C3:
+Core verification under C3:
 
 ```sh
-jg -batch -proj my_proj_simpleooo_nofwd_c3 verification/verify_nofwd_ct_ptci_c3_simpleooo.tcl
-jg -batch -proj my_proj_simpleooo_delay_c3 verification/verify_delay_ct_ptci_c3_simpleooo.tcl
+jg -batch -proj my_proj_sodor experiments/core/sodor.tcl
+jg -batch -proj my_proj_sodor_s experiments/core/sodor_s.tcl
+jg -batch -proj my_proj_simpleooo experiments/core/simpleooo.tcl
+jg -batch -proj my_proj_simpleooo_s experiments/core/simpleooo_s.tcl
 ```
 
-Sodor C4 with and without the PMP constraint:
+Uncore platform compliance:
 
 ```sh
-jg -batch -proj my_proj_sodor_c4_no_pmp results/sodor/verify_c4_no_pmp.tcl
-jg -batch -proj my_proj_sodor_c4_pmp results/sodor/verify_c4_pmp.tcl
+jg -batch -proj my_proj_regular_cache experiments/uncore/regular_cache.tcl
+jg -batch -proj my_proj_secure_cache experiments/uncore/secure_cache.tcl
+jg -batch -proj my_proj_interrupt_controller experiments/uncore/interrupt_controller.tcl
 ```
+
+See [`experiments/README.md`](experiments/README.md) for the purpose and
+expected result of each script.
 
 Generated JasperGold project directories, databases, and raw terminal logs are
 intentionally excluded from version control.

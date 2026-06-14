@@ -1,9 +1,10 @@
 # =============================================================================
-# Experiment II: Cache Contract Compliance Verification
+# Regular Cache: Uncore Contract Compliance Verification
 # =============================================================================
 # II-a: Regular Cache C2 compliance → expected PASS
 # II-b: Regular Cache C1 compliance → expected FAIL
 # II-c: Cache-S C1 compliance       → expected PASS
+# Expected result: two proofs and one counterexample
 # =============================================================================
 
 analyze +define+RF_SIZE=4+RF_SIZE_LOG=2+MEMI_SIZE=16+MEMI_SIZE_LOG=4+MEMD_SIZE=4+MEMD_SIZE_LOG=2+ROB_SIZE=4+ROB_SIZE_LOG=2 -sva ./src/simpleooo/cache_miter_c2.v
@@ -47,5 +48,5 @@ set_engine_mode {AM}
 set_prove_time_limit 1h
 
 prove -all
-save -jdb results/my_jdb_cache_compliance -capture_setup -capture_session_data -force
+save -jdb my_jdb_regular_cache -capture_setup -capture_session_data -force
 exit
