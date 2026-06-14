@@ -1,7 +1,7 @@
-# Curated Follow-up Experiments
+# Experiment Scripts
 
-This directory contains selected JasperGold entry scripts that complement the
-primary experiments in `verification/`. Intermediate scripts, generated
+This directory contains the JasperGold scripts used to reproduce the platform
+compliance, Sodor, and SimpleOoO experiments. Intermediate scripts, generated
 parameter sweeps, GUI helpers, and superseded versions are intentionally not
 included.
 
