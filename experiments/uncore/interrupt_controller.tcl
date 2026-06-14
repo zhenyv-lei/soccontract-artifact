@@ -6,9 +6,9 @@
 # Expected result: C2 counterexample; C3-permitted flow is reachable
 # =============================================================================
 
-analyze -sva src/verification/uncore/interrupt_controller_compliance.sv src/uncore/interrupt_controller/interrupt_controller.v src/core/sodor/param.vh
+analyze -sva src/verification/uncore/miter_interrupt_controller_compliance.sv src/uncore/interrupt_controller/interrupt_controller.v src/core/sodor/param.vh
 
-elaborate -top intctrl_compliance_top
+elaborate -top miter_interrupt_controller_compliance
 clock clk
 reset rst -non_resettable_regs 0
 

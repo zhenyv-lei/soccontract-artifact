@@ -12,7 +12,7 @@
 //   (C1 does NOT allow addr→gnt)
 // =============================================================================
 
-module cache_compliance_top(
+module miter_cache_compliance(
     input clk,
     input rst
 );

@@ -76,8 +76,8 @@ the peripheral range can remove this channel.
 
 - `src/core/`: processor RTL for Sodor and SimpleOoO.
 - `src/uncore/`: cache and interrupt-controller RTL.
-- `src/verification/`: two-copy core verification tops, PTCI, and uncore
-  compliance miters.
+- `src/verification/`: core and uncore formal-verification miters, including
+  PTCI and comparison logic.
 - `experiments/core/`: C3 verification for the four processor configurations.
 - `experiments/uncore/`: platform compliance checks for the uncore components.
 

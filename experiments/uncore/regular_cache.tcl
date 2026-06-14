@@ -7,9 +7,9 @@
 # Expected result: two proofs and one counterexample
 # =============================================================================
 
-analyze +define+RF_SIZE=4+RF_SIZE_LOG=2+MEMI_SIZE=16+MEMI_SIZE_LOG=4+MEMD_SIZE=4+MEMD_SIZE_LOG=2+ROB_SIZE=4+ROB_SIZE_LOG=2 -sva ./src/verification/uncore/cache_compliance.v
+analyze +define+RF_SIZE=4+RF_SIZE_LOG=2+MEMI_SIZE=16+MEMI_SIZE_LOG=4+MEMD_SIZE=4+MEMD_SIZE_LOG=2+ROB_SIZE=4+ROB_SIZE_LOG=2 -sva ./src/verification/uncore/miter_cache_compliance.v
 
-elaborate -top cache_compliance_top
+elaborate -top miter_cache_compliance
 clock clk
 reset rst -non_resettable_regs 0
 

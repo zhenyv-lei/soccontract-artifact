@@ -14,7 +14,7 @@
 // Expected: FAIL (secret-dependent store data triggers different interrupts)
 // =============================================================================
 
-module top(
+module miter_simpleooo_c3(
     input clk,
     input rst
 );

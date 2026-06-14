@@ -10,7 +10,7 @@
 // Expected result: PASS
 // =============================================================================
 
-module cache_miter_top(
+module miter_secure_cache_c1(
     input clk,
     input rst
 );

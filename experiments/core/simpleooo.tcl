@@ -6,9 +6,9 @@
 # Expected result: FAIL (secret-dependent store data triggers interrupt divergence)
 # =============================================================================
 
-analyze +define+RF_SIZE=4+RF_SIZE_LOG=2+MEMI_SIZE=16+MEMI_SIZE_LOG=4+MEMD_SIZE=4+MEMD_SIZE_LOG=2+ROB_SIZE=4+ROB_SIZE_LOG=2+BR_PREDICT=0+USE_DEFENSE_PARTIAL_STT=+PARTIAL_STT_USE_SPEC=+OBSV=0+INIT_VALUE=0+IMM_STALL= -sva ./src/verification/core/simpleooo_c3.v
+analyze +define+RF_SIZE=4+RF_SIZE_LOG=2+MEMI_SIZE=16+MEMI_SIZE_LOG=4+MEMD_SIZE=4+MEMD_SIZE_LOG=2+ROB_SIZE=4+ROB_SIZE_LOG=2+BR_PREDICT=0+USE_DEFENSE_PARTIAL_STT=+PARTIAL_STT_USE_SPEC=+OBSV=0+INIT_VALUE=0+IMM_STALL= -sva ./src/verification/core/miter_simpleooo_c3.v
 
-elaborate -top top -bbox_mul 256
+elaborate -top miter_simpleooo_c3 -bbox_mul 256
 clock clk
 reset rst -non_resettable_regs 0
 

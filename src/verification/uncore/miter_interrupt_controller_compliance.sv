@@ -8,7 +8,7 @@
 // Platform_C3: wdata CAN affect int → expected PASS
 // =============================================================================
 
-module intctrl_compliance_top(
+module miter_interrupt_controller_compliance(
     input clk,
     input rst
 );

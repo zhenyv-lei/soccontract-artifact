@@ -2,21 +2,22 @@
 `include "src/core/sodor/sodor_2_stage.sv"
 
 // =============================================================================
-// Sodor CPU_C3: Core Verification under C3 Platform Timing Contract
+// Sodor-S CPU_C3: Secure Sodor under C3 Platform Timing Contract
 // =============================================================================
 // C3 contract (cache + interrupt platform):
 //   (1) req   -> diamond{gnt, rdata}
 //   (2) addr  -> diamond{gnt, rdata}
 //   (3) we    -> diamond{gnt, rdata}
-//   (4) wdata -> diamond{gnt, rdata, int}   ← C3: wdata can affect timing AND interrupt
+//   (4) wdata -> diamond{gnt, rdata, int}
 //
-// Compared to C2: wdata can now affect gnt (timing) and int (interrupt signal).
-// This models a platform with memory-mapped interrupt controller.
+// Defense: Mask interrupts during store execution.
+// When CPU is performing a store, interrupt signal is gated to 0.
+// This prevents wdata from affecting timing through the interrupt path.
 //
-// Expected: FAIL (store with secret-dependent data triggers different interrupts)
+// Expected: PASS (interrupt masking blocks the wdata→int→timing leak)
 // =============================================================================
 
-module top(
+module miter_sodor_s_c3(
     input clk,
     input rst
 );
@@ -116,7 +117,36 @@ wire [31:0] io_dmem_resp_bits_data_copy2 = allow_dmem_rdata_diff ? io_dmem_resp_
 wire        int_copy2 = allow_int_diff ? int_unc : int_shared;
 
 // =========================================================================
-// Core instantiation: copy1 (shared inputs)
+// Sodor-S Defense: Sticky interrupt mask after store execution
+// =========================================================================
+// Once a store has been executed, permanently mask interrupts.
+// Rationale: after a store, the interrupt controller's state may depend on
+// secret data (wdata). Any future interrupt could leak timing information.
+// This is conservative but guarantees no wdata→int→timing leak.
+//
+// Before any store: both copies see the same interrupt → safe
+// After a store: interrupts permanently masked → no timing leak → safe
+
+wire store_active_1 = copy1.io_dmem_req_valid & copy1.io_dmem_req_bits_fcn;
+wire store_active_2 = copy2.io_dmem_req_valid & copy2.io_dmem_req_bits_fcn;
+
+reg int_mask_1, int_mask_2;
+always @(posedge clk) begin
+    if (rst) begin
+        int_mask_1 <= 0;
+        int_mask_2 <= 0;
+    end else begin
+        if (store_active_1) int_mask_1 <= 1;
+        if (store_active_2) int_mask_2 <= 1;
+    end
+end
+
+// Gate interrupt: permanently masked after first store
+wire int_gated_1 = int_shared & ~int_mask_1;
+wire int_gated_2 = int_copy2  & ~int_mask_2;
+
+// =========================================================================
+// Core instantiation: copy1 (shared inputs, gated interrupt)
 // =========================================================================
 Core copy1(
     .clock(stall_1 ? 1'b0 : clk),
@@ -128,13 +158,13 @@ Core copy1(
     .io_interrupt_debug(1'b0),
     .io_interrupt_mtip(1'b0),
     .io_interrupt_msip(1'b0),
-    .io_interrupt_meip(int_shared),    // shared interrupt
+    .io_interrupt_meip(int_gated_1),   // gated interrupt (masked during store)
     .io_hartid(1'b0),
     .io_reset_vector(32'b0)
 );
 
 // =========================================================================
-// Core instantiation: copy2 (PTCI-controlled inputs)
+// Core instantiation: copy2 (PTCI-controlled inputs, gated interrupt)
 // =========================================================================
 Core copy2(
     .clock(stall_2 ? 1'b0 : clk),
@@ -146,7 +176,7 @@ Core copy2(
     .io_interrupt_debug(1'b0),
     .io_interrupt_mtip(1'b0),
     .io_interrupt_msip(1'b0),
-    .io_interrupt_meip(int_copy2),     // PTCI-controlled interrupt
+    .io_interrupt_meip(int_gated_2),   // gated interrupt (masked during store)
     .io_hartid(1'b0),
     .io_reset_vector(32'b0)
 );
@@ -163,7 +193,9 @@ assign diff_imem_addr  = |(copy1.io_imem_req_bits_addr ^ copy2.io_imem_req_bits_
 assign diff_dmem_req   = copy1.io_dmem_req_valid      ^ copy2.io_dmem_req_valid;
 assign diff_dmem_addr  = |(copy1.io_dmem_req_bits_addr ^ copy2.io_dmem_req_bits_addr);
 assign diff_dmem_we    = copy1.io_dmem_req_bits_fcn   ^ copy2.io_dmem_req_bits_fcn;
-assign diff_dmem_wdata = |(copy1.io_dmem_req_bits_data ^ copy2.io_dmem_req_bits_data);
+// Only detect wdata difference during STORE (fcn=1), not during LOAD
+assign diff_dmem_wdata = (copy1.io_dmem_req_bits_fcn & copy2.io_dmem_req_bits_fcn) &
+                         |(copy1.io_dmem_req_bits_data ^ copy2.io_dmem_req_bits_data);
 
 // =========================================================================
 // Shadow Logic (C3 version: distinguish program vs interrupt PC changes)
