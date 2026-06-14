@@ -8,51 +8,55 @@ The paper is included as [`soccontracts.pdf`](soccontracts.pdf).
 
 ## Overview
 
-Platform timing contracts summarize the timing-relevant information flows
-between a processor core and its surrounding platform. They enable a
-compositional verification strategy:
+Platform timing contracts summarize timing-relevant information flows between a
+processor core and its surrounding platform. They enable a compositional
+verification strategy:
 
 ```text
-CPU_TCI(C4) and Platform_TCI(C4) imply Secure(Core + Platform)
+CPU_TCI(Ci) and Platform_TCI(Ci) imply Secure(Core + Platform)
 ```
 
 The processor core and platform can therefore be verified independently against
-the same contract. A direct full-system verification is retained as a control
-experiment for comparing verification effort.
+the same contract. Direct full-system verification is retained as a control for
+comparing verification effort.
 
 ## Demo Scope
 
-This cleaned demonstration focuses on the conditional C4 contract and a Sodor
-processor connected to a memory-mapped interrupt controller.
+This cleaned demonstration includes three platform timing contracts:
 
-C4 permits write data to influence timing and interrupt behavior only when the
-write address is within the designated peripheral range. The PMP-constrained
-configuration prevents secret-dependent writes to that range.
+| Contract | Demonstrated platform behavior |
+| --- | --- |
+| C1 | Fixed-latency platform with address-independent timing. |
+| C2 | Cache platform with address-dependent timing. |
+| C4 | Conditional interrupt platform where write data may affect interrupts only within a peripheral address range. |
 
 The repository contains three verification layers:
 
-1. **Core verification:** verifies Sodor against C4 using PTCI without a
-   concrete platform implementation.
-2. **Uncore verification:** verifies that the address-decoded interrupt
-   controller complies with C4.
-3. **Full-system verification:** directly composes Sodor and the interrupt
-   controller as a control experiment.
+1. **Core verification:** verifies Sodor against C1, C2, and C4 using PTCI
+   without instantiating a concrete platform.
+2. **Uncore verification:** verifies representative platforms against C1, C2,
+   and C4.
+3. **Full-system verification:** directly composes Sodor with the C2 cache or
+   C4 interrupt-controller platform as control experiments.
 
 Support for the unconditional C3 contract is a **TODO** and is intentionally not
 included in the current runnable experiments.
 
-## Demonstrated Results
+## Historical Results
 
-Historical JasperGold runs from the development repository produced:
+Selected JasperGold results from the development repository:
 
-| Verification object | Configuration | Result | Time |
+| Verification object | Contract/configuration | Result | Time |
 | --- | --- | --- | --- |
-| Core under C4 | Sodor without PMP | Counterexample | 0.44 s |
-| Core under C4 | Sodor with PMP | Proven | 8.13 s |
-| Full system | Sodor + interrupt controller, without PMP | Timeout | 604800.31 s |
-| Full system | Sodor + interrupt controller, with PMP | Proven | 1.70 s |
+| Core | Sodor under C1 | Proven | 4.82 s |
+| Core | Sodor under C2 | Proven | 7.76 s |
+| Core | Sodor under C4 without PMP | Counterexample | 0.44 s |
+| Core | Sodor under C4 with PMP | Proven | 8.13 s |
+| Full system | Sodor + regular cache under C2 | Proven | 25.30 s |
+| Full system | Sodor + interrupt controller under C4, without PMP | Timeout | 604800.31 s |
+| Full system | Sodor + interrupt controller under C4, with PMP | Proven | 1.70 s |
 
-The seven-day full-system timeout demonstrates that direct composition can
+The seven-day C4 full-system timeout demonstrates that direct composition can
 create a difficult verification problem. It does not imply that every
 full-system verification attempt times out.
 
@@ -60,12 +64,10 @@ full-system verification attempt times out.
 
 - `src/core/`: processor RTL.
 - `src/uncore/`: platform-component RTL.
-- `src/verification/core/`: core-side C4 PTCI miter.
-- `src/verification/uncore/`: platform-side C4 compliance miter.
-- `src/verification/system/`: direct core-plus-uncore control miter.
-- `experiments/core/`: core-side C4 JasperGold scripts.
-- `experiments/uncore/`: platform-side C4 JasperGold script.
-- `experiments/system/`: direct full-system control scripts.
+- `src/verification/core/`: core-side C1, C2, and C4 PTCI miters.
+- `src/verification/uncore/`: platform-side C1, C2, and C4 compliance miters.
+- `src/verification/system/`: direct C2 and C4 full-system control miters.
+- `experiments/`: JasperGold scripts organized by verification layer.
 - `results/`: concise summaries of historical results.
 
 ## Requirements
@@ -78,24 +80,34 @@ an expected experimental result.
 
 ## Running the Demo
 
-Run the decomposed C4 verification:
+Run core-side verification:
 
 ```sh
+jg -batch -proj my_proj_sodor_c1 experiments/core/sodor_c1.tcl
+jg -batch -proj my_proj_sodor_c2 experiments/core/sodor_c2.tcl
 jg -batch -proj my_proj_sodor_c4 experiments/core/sodor_c4.tcl
 jg -batch -proj my_proj_sodor_s_c4 experiments/core/sodor_s_c4.tcl
+```
+
+Run platform-side compliance verification:
+
+```sh
+jg -batch -proj my_proj_secure_cache_c1 experiments/uncore/secure_cache_c1.tcl
+jg -batch -proj my_proj_regular_cache_c2 experiments/uncore/regular_cache_c2.tcl
 jg -batch -proj my_proj_interrupt_controller_c4 experiments/uncore/interrupt_controller_c4.tcl
 ```
 
-Run the direct full-system controls:
+Run direct full-system controls:
 
 ```sh
+jg -batch -proj my_proj_system_c2 experiments/system/sodor_regular_cache_c2.tcl
 jg -batch -proj my_proj_system_c4 experiments/system/sodor_interrupt_controller_c4.tcl
 jg -batch -proj my_proj_system_s_c4 experiments/system/sodor_s_interrupt_controller_c4.tcl
 ```
 
-The configured time limits are upper bounds. In particular, reproducing the
-historical full-system timeout requires allowing the baseline control to run
-for seven days.
+The configured time limits are upper bounds. Reproducing the historical C4
+full-system timeout requires allowing the baseline control to run for seven
+days.
 
 See [`experiments/README.md`](experiments/README.md) for the expected result of
 each script and [`results/README.md`](results/README.md) for the historical

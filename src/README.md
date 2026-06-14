@@ -10,12 +10,13 @@ The source tree is organized by hardware and verification responsibility:
   the JasperGold experiment scripts. Miter files and their top-level modules use
   the `miter_<subject>_<contract-or-variant>` naming convention.
 
-The current demonstration contains core-side, uncore-side, and direct
-full-system miters for C4. C3 miter support is a TODO.
+The current demonstration contains core-side and uncore-side miters for C1, C2,
+and C4, plus direct full-system controls for C2 and C4. C3 miter support is a
+TODO.
 
-Both C4 core configurations reuse the same Sodor RTL. The Sodor-S experiment is
+All core experiments reuse the same Sodor RTL. The Sodor-S C4 experiment is
 represented by the PMP constraint in its JasperGold script rather than by a
 separate processor implementation.
 
 The SimpleOoO RTL is retained as source provenance but is not part of the
-current runnable C4 demonstration.
+current runnable demonstration.
