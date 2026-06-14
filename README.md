@@ -1,6 +1,6 @@
 # Platform Timing Contracts
 
-Experimental artifact and follow-up experiments for:
+Demonstration of core and uncore verification for:
 
 > **Platform Timing Contracts: A Language and Instrumentation for Capturing SoC Timing Channels**
 
@@ -56,17 +56,16 @@ The contracts model increasingly permissive platform-induced flows:
 A processor verified under a contract is only secure when integrated with a
 platform compatible with that contract.
 
-## Main Results
+## Demonstrated Results
 
-The retained experiments demonstrate that stronger processor-side defenses are
-required as the platform permits more feedback channels:
+The retained core experiments compare four processor configurations under C3:
 
-| Processor configuration | C1 | C2 | C3 |
-| --- | --- | --- | --- |
-| SimpleOoO with NoFwd | Pass | Fail | Fail |
-| SimpleOoO-S with Delay and PMP | Pass | Pass | Pass |
-| Sodor | Pass | Pass | Fail |
-| Sodor-S with interrupt masking | Pass | Pass | Pass |
+| Processor configuration | C3 result |
+| --- | --- |
+| SimpleOoO with NoFwd | Counterexample |
+| SimpleOoO-S with Delay and PMP | Proven |
+| Sodor | Counterexample |
+| Sodor-S with interrupt masking | Proven |
 
 The C3 experiments show that secret-dependent stores can affect a
 memory-mapped interrupt controller and create observable timing differences.
@@ -89,9 +88,14 @@ commercial software and is not distributed with this repository.
 
 Run all commands from the repository root.
 
-## Reproducing Experiments
+## Running the Demo
 
-Core verification under C3:
+Each command below runs one independent JasperGold project from the repository
+root. A **counterexample is an expected result**, not a failure to run the
+experiment. The limits configured in the scripts are upper bounds; actual
+runtime depends on the JasperGold version and available compute resources.
+
+Run the four C3 core-verification cases:
 
 ```sh
 jg -batch -proj my_proj_sodor experiments/core/sodor.tcl
@@ -100,7 +104,7 @@ jg -batch -proj my_proj_simpleooo experiments/core/simpleooo.tcl
 jg -batch -proj my_proj_simpleooo_s experiments/core/simpleooo_s.tcl
 ```
 
-Uncore platform compliance:
+Run the three uncore-compliance cases:
 
 ```sh
 jg -batch -proj my_proj_regular_cache experiments/uncore/regular_cache.tcl
@@ -113,6 +117,9 @@ expected result of each script.
 
 Generated JasperGold project directories, databases, and raw terminal logs are
 intentionally excluded from version control.
+
+This demo does not reproduce every experiment or evaluation result reported in
+the paper.
 
 ## Code Provenance
 

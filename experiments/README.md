@@ -1,7 +1,8 @@
 # Experiments
 
-This directory contains the JasperGold scripts used to reproduce the artifact
-experiments. Run all scripts from the repository root.
+This directory contains the JasperGold scripts included in this demonstration.
+Run each script independently from the repository root. A counterexample is an
+expected experimental result where indicated.
 
 ## Core
 
