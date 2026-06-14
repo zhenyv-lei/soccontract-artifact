@@ -79,7 +79,7 @@ can remove this channel.
 - `src/simpleooo/`: SimpleOoO RTL, cache models, interrupt model, and PTCI
   verification tops.
 - `verification/`: primary JasperGold verification entry scripts.
-- `results/`: additional experiment-specific JasperGold TCL scripts.
+- `results/`: curated follow-up experiments grouped by processor or platform.
 
 ## Requirements
 
@@ -107,8 +107,8 @@ jg -batch -proj my_proj_simpleooo_delay_c3 verification/verify_delay_ct_ptci_c3_
 Sodor C4 with and without the PMP constraint:
 
 ```sh
-jg -batch -proj my_proj_sodor_c4_no_pmp results/veri_sodor_cpu_c4_no_pmp.tcl
-jg -batch -proj my_proj_sodor_c4_pmp results/veri_sodor_cpu_c4_pmp.tcl
+jg -batch -proj my_proj_sodor_c4_no_pmp results/sodor/verify_c4_no_pmp.tcl
+jg -batch -proj my_proj_sodor_c4_pmp results/sodor/verify_c4_pmp.tcl
 ```
 
 Generated JasperGold project directories, databases, and raw terminal logs are
