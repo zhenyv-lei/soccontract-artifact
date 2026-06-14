@@ -1,0 +1,18 @@
+# OS and editor files
+.DS_Store
+.vscode/
+__pycache__/
+*.pyc
+
+# JasperGold projects, databases, caches, and transient logs
+jgproject*/
+my_proj_*/
+my_jdb_*
+*.jdb
+*.vcd
+*.lock
+*.log
+jg_zygote.err
+
+# Build output
+build/
