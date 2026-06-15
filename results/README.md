@@ -5,6 +5,10 @@ included. The following values were extracted from historical development runs.
 
 | Method | Verification object | Result | Time |
 | --- | --- | --- | --- |
+| Decomposed | SimpleOoO under C1 | Proven | 652 s |
+| Decomposed | SimpleOoO-S under C1 | Proven | 207 s |
+| Decomposed | SimpleOoO under C2 | Counterexample | 32.91 s |
+| Decomposed | SimpleOoO-S under C2 | Proven | 8118 s |
 | Decomposed | Sodor under C1 | Proven | 4.82 s |
 | Decomposed | Sodor under C2 | Proven | 7.76 s |
 | Decomposed | Sodor under C4 without PMP | Counterexample | 0.44 s |

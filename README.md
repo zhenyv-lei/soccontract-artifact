@@ -32,8 +32,9 @@ This cleaned demonstration includes three platform timing contracts:
 
 The repository contains three verification layers:
 
-1. **Core verification:** verifies Sodor against C1, C2, and C4 using PTCI
-   without instantiating a concrete platform.
+1. **Core verification:** verifies SimpleOoO against C1 and C2, and Sodor
+   against C1, C2, and C4, using PTCI without instantiating a concrete
+   platform.
 2. **Uncore verification:** verifies representative platforms against C1, C2,
    and C4.
 3. **Full-system verification:** directly composes Sodor with the C2 cache or
@@ -48,6 +49,10 @@ Selected JasperGold results from the development repository:
 
 | Verification object | Contract/configuration | Result | Time |
 | --- | --- | --- | --- |
+| Core | SimpleOoO under C1 | Proven | 652 s |
+| Core | SimpleOoO-S under C1 | Proven | 207 s |
+| Core | SimpleOoO under C2 | Counterexample | 32.91 s |
+| Core | SimpleOoO-S under C2 | Proven | 8118 s |
 | Core | Sodor under C1 | Proven | 4.82 s |
 | Core | Sodor under C2 | Proven | 7.76 s |
 | Core | Sodor under C4 without PMP | Counterexample | 0.44 s |
@@ -80,7 +85,16 @@ an expected experimental result.
 
 ## Running the Demo
 
-Run core-side verification:
+Run SimpleOoO core-side verification:
+
+```sh
+jg -batch -proj my_proj_simpleooo_c1 experiments/core/simpleooo_c1.tcl
+jg -batch -proj my_proj_simpleooo_s_c1 experiments/core/simpleooo_s_c1.tcl
+jg -batch -proj my_proj_simpleooo_c2 experiments/core/simpleooo_c2.tcl
+jg -batch -proj my_proj_simpleooo_s_c2 experiments/core/simpleooo_s_c2.tcl
+```
+
+Run Sodor core-side verification:
 
 ```sh
 jg -batch -proj my_proj_sodor_c1 experiments/core/sodor_c1.tcl
